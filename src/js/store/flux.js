@@ -1,43 +1,66 @@
 const getState = ({ getStore, getActions, setStore }) => {
+
 	return {
+
 		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+
+			contact: [{
+				name: "",
+				email: "",
+				phone: "",
+				address: "",
+
+			}]
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
-			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
+			getContacts: () => {
+				fetch("https://playground.4geeks.com/contact/agendas/marjorie/contacts")
+					.then((response) => response.json())
+					.then((data) => setStore({ contact: data.contacts }))
+					.catch((error) => error)
+			},
 
-				//reset the global store
-				setStore({ demo: demo });
-			}
+			addContact: (name, email, phone, address) => {
+				fetch("https://playground.4geeks.com/contact/agendas/marjorie/contacts", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						name: name,
+						email: email,
+						phone: phone,
+						address: address
+					}),
+
+				})
+					.then((response) => response.jason())
+					.then(() => getActions().getContacts())
+					.catch((error) => error)
+			},
+			editContact: (id, editContact) => {
+				fetch("https://playground.4geeks.com/contact/agendas/marjorie/contacts" + id, {
+					method: "PUT",
+					headers: {
+						"content-Type": "application/json",
+					},
+					body: JSON.stringify(editContact),
+				})
+					.then((response) => response.jason())
+					.then(() => getActions().getContacts())
+					.catch((error) => error)
+			},
+
+			delContacts: function (id) {
+				fetch("https://playground.4geeks.com/contact/agendas/marjorie/contacts" + id, {
+					method: 'DELETE'
+				})
+					.then((response) => response.json())
+					.then(() => getActions().getContacts())
+					.catch((error) => error)
+			},
+
 		}
 	};
 };
